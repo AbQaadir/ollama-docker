@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  ollama:
+    build: 
+      context: ./ollama
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - OLLAMA_HOST=0.0.0.0:8080
+      - OLLAMA_MODELS=/models
+      - OLLAMA_DEBUG=false
+      - OLLAMA_KEEP_ALIVE=-1
+      - MODEL=llama3.2:3b
+      - HOME=/home/updatesuser
+    volumes:
+      - ./models:/models
+
+  fastapi:
+    build:
+      context: ./fastapi
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_SERVICE_URL=http://ollama:8080  # FastAPI can use this to access Ollama
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+networks:
+  default:
+    name: ollama_network
