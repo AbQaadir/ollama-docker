@@ -15,6 +15,14 @@ ENV OLLAMA_KEEP_ALIVE=-1
 # Store the model weights in the container image
 ENV MODEL=llama3.2:3b
 
+
+# Create and set a non-root user
+RUN groupadd --gid 10014 updates && \
+    useradd --no-create-home --uid 10014 -g updates updatesuser
+
+USER 10014
+
+
 # Pull the model weights
 RUN ollama serve & sleep 5 && ollama pull $MODEL
 
