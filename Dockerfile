@@ -21,8 +21,11 @@ RUN groupadd --gid 10014 updates && \
     mkdir -p /home/updatesuser && \
     chown -R updatesuser:updates /home/updatesuser
 
+# switch to the non-root user
+USER 10014
+
 # Pull the model weights
-RUN su - updatesuser -c "ollama serve & sleep 5 && ollama pull llama3.2:3b"
+RUN ollama serve & sleep 5 && ollama pull llama3.2:3b
 
 # Start Ollama
 ENTRYPOINT ["ollama", "serve"]
